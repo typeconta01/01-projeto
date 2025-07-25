@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 import { supabase } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 export default function CadastroPage() {
   if (typeof window === "undefined") return null;
@@ -15,6 +16,7 @@ export default function CadastroPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
@@ -22,23 +24,39 @@ export default function CadastroPage() {
     setError(null);
     setSuccess(false);
     
-    // Primeiro, criar o usuário com email e senha
-    const { data, error: signUpError } = await supabase.auth.signUp({ 
-      email, 
-      password,
-      options: {
-        data: {
-          name: name // Salvar o nome nos metadados do usuário
+    try {
+      // Primeiro, criar o usuário com email e senha
+      const { data, error: signUpError } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: {
+            name: name // Salvar o nome nos metadados do usuário
+          }
+        }
+      });
+      
+      if (signUpError) {
+        setError(signUpError.message);
+      } else {
+        // Se o cadastro foi bem-sucedido, fazer login automático
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (signInError) {
+          setError('Cadastro realizado, mas erro no login automático: ' + signInError.message);
+        } else {
+          // Login bem-sucedido, redirecionar para o dashboard
+          router.push('/dashboard');
         }
       }
-    });
-    
-    if (signUpError) {
-      setError(signUpError.message);
-    } else {
-      setSuccess(true);
+    } catch (error) {
+      setError('Erro inesperado: ' + (error as Error).message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (
@@ -111,11 +129,11 @@ export default function CadastroPage() {
               className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg text-lg font-semibold shadow-md transition-colors duration-200"
               disabled={loading}
             >
-              {loading ? 'Cadastrando...' : 'Criar Conta'}
+              {loading ? 'Criando conta...' : 'Criar Conta'}
             </Button>
           </div>
           {error && <div className="text-red-600 text-center">{error}</div>}
-          {success && <div className="text-green-600 text-center">Cadastro realizado! Verifique seu email.</div>}
+          {success && <div className="text-green-600 text-center">Redirecionando para o dashboard...</div>}
         </form>
 
         <p className="text-center text-gray-600 mt-8">
