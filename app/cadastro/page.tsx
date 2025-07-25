@@ -8,6 +8,7 @@ import { ArrowLeft, Eye, EyeOff } from "lucide-react"
 import { supabase } from '@/lib/supabaseClient';
 
 export default function CadastroPage() {
+  if (typeof window === "undefined") return null;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
