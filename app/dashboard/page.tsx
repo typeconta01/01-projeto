@@ -88,7 +88,7 @@ export default function DashboardPage() {
               <Link href="/saque" passHref legacyBehavior>
                 <Button asChild variant="link" className="p-0 h-auto text-orange-500 hover:text-orange-600 text-sm">
                   <a>Toque para sacar</a>
-                </Button>
+              </Button>
               </Link>
             </CardContent>
           </Card>
@@ -134,24 +134,24 @@ export default function DashboardPage() {
               iconType="book"
             />
             <div className={`${!pixPago ? 'opacity-50 pointer-events-none select-none' : ''}`}>
-              <BookCard
-                title="Código Vermelho"
-                author="Alexandre Ferreira"
-                genre="Thriller Tecnológico"
-                price={75.0}
-                status="pending"
-                iconType="clock"
+            <BookCard
+              title="Código Vermelho"
+              author="Alexandre Ferreira"
+              genre="Thriller Tecnológico"
+              price={75.0}
+              status="pending"
+              iconType="clock"
                 bloqueado={!pixPago}
-              />
-              <BookCard
-                title="O Jardim das Memórias Perdidas"
-                author="Clara Monteiro"
-                genre="Romance Contemporâneo"
-                price={125.0}
-                status="pending"
-                iconType="clock"
+            />
+            <BookCard
+              title="O Jardim das Memórias Perdidas"
+              author="Clara Monteiro"
+              genre="Romance Contemporâneo"
+              price={125.0}
+              status="pending"
+              iconType="clock"
                 bloqueado={!pixPago}
-              />
+            />
             </div>
           </div>
         </section>
