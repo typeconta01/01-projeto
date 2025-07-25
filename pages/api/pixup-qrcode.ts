@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        amount: valor || 39.99,
+        amount: 1.00,
         debtor: {
           name: nome,
           document: cpf,
@@ -64,6 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           document: cpf,
         },
         description: descricao || 'Upgrade para Avaliador Internacional',
+        postbackUrl: process.env.NEXT_PUBLIC_PIXUP_WEBHOOK_URL || 'https://seusite.com/api/pixup-webhook',
       }),
     });
     if (!pixRes.ok) {

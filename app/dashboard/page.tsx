@@ -10,11 +10,13 @@ import BookCard from "@/components/book-card"
 import Link from "next/link"
 import { supabase } from '@/lib/supabaseClient'
 import { SettingsDialog } from '@/components/settings-dialog';
+import { usePixStatus } from "@/hooks/use-pix-status";
 
 export default function DashboardPage() {
   const [userName, setUserName] = useState("Carregando...")
   const [userLevel, setUserLevel] = useState("Nível bronze")
   const [loading, setLoading] = useState(true)
+  const { pixPago, loading: loadingPix } = usePixStatus();
 
   useEffect(() => {
     async function getUserData() {
@@ -131,22 +133,26 @@ export default function DashboardPage() {
               status="available"
               iconType="book"
             />
-            <BookCard
-              title="Código Vermelho"
-              author="Alexandre Ferreira"
-              genre="Thriller Tecnológico"
-              price={75.0}
-              status="pending"
-              iconType="clock"
-            />
-            <BookCard
-              title="O Jardim das Memórias Perdidas"
-              author="Clara Monteiro"
-              genre="Romance Contemporâneo"
-              price={125.0}
-              status="pending"
-              iconType="clock"
-            />
+            <div className={`${!pixPago ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+              <BookCard
+                title="Código Vermelho"
+                author="Alexandre Ferreira"
+                genre="Thriller Tecnológico"
+                price={75.0}
+                status="pending"
+                iconType="clock"
+                bloqueado={!pixPago}
+              />
+              <BookCard
+                title="O Jardim das Memórias Perdidas"
+                author="Clara Monteiro"
+                genre="Romance Contemporâneo"
+                price={125.0}
+                status="pending"
+                iconType="clock"
+                bloqueado={!pixPago}
+              />
+            </div>
           </div>
         </section>
 

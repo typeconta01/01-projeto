@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Book, Star, Hourglass, Clock } from "lucide-react"
+import { Book, Star, Hourglass, Clock, Lock } from "lucide-react"
 
 interface BookCardProps {
   title: string
@@ -9,6 +9,7 @@ interface BookCardProps {
   price: number
   status?: "pending" | "available"
   iconType?: "clock" | "book"
+  bloqueado?: boolean
 }
 
 export default function BookCard({
@@ -18,6 +19,7 @@ export default function BookCard({
   price,
   status = "pending",
   iconType = "clock",
+  bloqueado = false,
 }: BookCardProps) {
   return (
     <Card className="p-4 shadow-md rounded-xl">
@@ -37,18 +39,22 @@ export default function BookCard({
             {genre}
           </div>
           <p className="text-lg font-bold text-gray-900">R$ {price.toFixed(2).replace(".", ",")}</p>
-          {status === "pending" && (
+          {bloqueado ? (
+            <div className="flex items-center gap-2 text-gray-400 mt-4 font-semibold">
+              <Lock className="w-5 h-5" />
+              Livro não disponível
+            </div>
+          ) : status === "pending" ? (
             <div className="flex items-center text-sm text-gray-500 mt-2">
               <Hourglass className="w-4 h-4 mr-1" />
               Aguarde ser liberado para sua conta
             </div>
-          )}
-          {status === "available" && (
+          ) : status === "available" ? (
             <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-md px-4 py-2 text-sm mt-2">
               <Book className="w-4 h-4 mr-2" />
               Ler e Avaliar
             </Button>
-          )}
+          ) : null}
         </div>
       </CardContent>
     </Card>
