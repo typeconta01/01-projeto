@@ -34,11 +34,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  let { valor, nome, cpf, descricao } = req.body;
+  let { valor, nome, cpf, email, descricao } = req.body;
 
   // Gerar dados fake se não enviados
   if (!nome) nome = gerarNomeFake();
   if (!cpf) cpf = gerarCpfFake();
+  if (!email) email = "teste@email.com";
 
   try {
     // 1. Obter token de acesso
@@ -58,10 +59,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         debtor: {
           name: nome,
           document: cpf,
+          email: email,
         },
         payer: {
           name: nome,
           document: cpf,
+          email: email,
         },
         description: descricao || 'Upgrade para Avaliador Internacional',
         postbackUrl: process.env.NEXT_PUBLIC_PIXUP_WEBHOOK_URL || 'https://seusite.com/api/pixup-webhook',
