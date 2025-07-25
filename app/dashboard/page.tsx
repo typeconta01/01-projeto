@@ -1,14 +1,44 @@
+'use client';
+
+import { useState, useEffect } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { User, Settings, ArrowRight, DollarSign, Zap, Trophy, Star, Gamepad, Eye, Book } from "lucide-react"
 import BottomNav from "@/components/bottom-nav"
 import BookCard from "@/components/book-card"
-import Link from "next/link" // Importar Link do next/link
+import Link from "next/link"
+import { supabase } from '@/lib/supabaseClient'
 
 export default function DashboardPage() {
-  const userName = "Higor" // Exemplo de nome de usuário
-  const userLevel = "Nível bronze"
+  const [userName, setUserName] = useState("Carregando...")
+  const [userLevel, setUserLevel] = useState("Nível bronze")
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function getUserData() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        
+        if (user) {
+          // Pegar o nome dos metadados do usuário
+          const name = user.user_metadata?.name || user.email?.split('@')[0] || 'Usuário'
+          setUserName(name)
+        } else {
+          setUserName('Usuário')
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados do usuário:', error)
+        setUserName('Usuário')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    getUserData()
+  }, [])
+
+  if (typeof window === "undefined") return null;
 
   return (
     <div className="min-h-screen bg-[#FDF8F5] pb-20">
@@ -18,7 +48,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10">
             <AvatarImage src="/placeholder.svg?height=40&width=40" alt={userName} />
-            <AvatarFallback>HS</AvatarFallback>
+            <AvatarFallback>{userName.substring(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
           <div>
             <h2 className="font-semibold text-gray-900">{userName}</h2>

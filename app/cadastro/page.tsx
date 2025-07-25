@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 export default function CadastroPage() {
   if (typeof window === "undefined") return null;
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,9 +21,20 @@ export default function CadastroPage() {
     setLoading(true);
     setError(null);
     setSuccess(false);
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      setError(error.message);
+    
+    // Primeiro, criar o usuário com email e senha
+    const { data, error: signUpError } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        data: {
+          name: name // Salvar o nome nos metadados do usuário
+        }
+      }
+    });
+    
+    if (signUpError) {
+      setError(signUpError.message);
     } else {
       setSuccess(true);
     }
@@ -50,6 +62,9 @@ export default function CadastroPage() {
               id="name"
               type="text"
               placeholder="Seu nome completo"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              required
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-orange-500 focus:border-orange-500 text-gray-800 bg-gray-50"
             />
           </div>
@@ -63,6 +78,7 @@ export default function CadastroPage() {
               placeholder="seu@email.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
+              required
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-orange-500 focus:border-orange-500 text-gray-800 bg-gray-50"
             />
           </div>
@@ -87,6 +103,7 @@ export default function CadastroPage() {
               placeholder="Sua senha (mín. 6 caracteres)"
               value={password}
               onChange={e => setPassword(e.target.value)}
+              required
               className="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-200 focus:ring-orange-500 focus:border-orange-500 text-gray-800 bg-gray-50"
             />
             <Button
