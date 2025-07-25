@@ -9,6 +9,7 @@ import BottomNav from "@/components/bottom-nav"
 import BookCard from "@/components/book-card"
 import Link from "next/link"
 import { supabase } from '@/lib/supabaseClient'
+import { SettingsDialog } from '@/components/settings-dialog';
 
 export default function DashboardPage() {
   const [userName, setUserName] = useState("Carregando...")
@@ -59,9 +60,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100">
-            <Settings className="w-5 h-5" />
-          </Button>
+          <SettingsDialog />
           {/* Botão de Sair que redireciona para /login */}
           <Link href="/login" passHref>
             <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100">
@@ -84,9 +83,11 @@ export default function DashboardPage() {
               </div>
               <p className="text-3xl font-bold text-green-600 mb-1">R$ 0,00</p>
               <p className="text-sm text-gray-500 mb-2">Total sacado: R$ 0,00</p>
-              <Button variant="link" className="p-0 h-auto text-orange-500 hover:text-orange-600 text-sm">
-                Toque para sacar
-              </Button>
+              <Link href="/saque" passHref legacyBehavior>
+                <Button asChild variant="link" className="p-0 h-auto text-orange-500 hover:text-orange-600 text-sm">
+                  <a>Toque para sacar</a>
+                </Button>
+              </Link>
             </CardContent>
           </Card>
           <Card className="p-4 shadow-md rounded-xl bg-white">

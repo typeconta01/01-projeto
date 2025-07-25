@@ -19,7 +19,7 @@ export default function BottomNav() {
         <Users className="w-5 h-5 mb-1" />
         Comunidade
       </Link>
-      <Link href="#" className="flex flex-col items-center text-gray-600 hover:text-orange-500 text-xs p-2 rounded-lg">
+      <Link href="/saque" className="flex flex-col items-center text-gray-600 hover:text-orange-500 text-xs p-2 rounded-lg">
         <Wallet className="w-5 h-5 mb-1" />
         Saque
       </Link>
