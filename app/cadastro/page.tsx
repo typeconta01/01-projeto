@@ -5,9 +5,28 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { supabase } from '@/lib/supabaseClient';
 
-export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false)
+export default function CadastroPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  async function handleSignUp(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      setError(error.message);
+    } else {
+      setSuccess(true);
+    }
+    setLoading(false);
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#FDF8F5] p-4">
@@ -21,7 +40,7 @@ export default function RegisterPage() {
           <p className="text-gray-600">Junte-se à comunidade de beta readers</p>
         </div>
 
-        <form className="space-y-6">
+        <form onSubmit={handleSignUp} className="space-y-6">
           <div>
             <label htmlFor="name" className="block text-gray-800 font-medium mb-2">
               Nome:
@@ -41,6 +60,8 @@ export default function RegisterPage() {
               id="email"
               type="email"
               placeholder="seu@email.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-orange-500 focus:border-orange-500 text-gray-800 bg-gray-50"
             />
           </div>
@@ -61,27 +82,22 @@ export default function RegisterPage() {
             </label>
             <Input
               id="password"
-              type={showPassword ? "text" : "password"}
+              type="password"
               placeholder="Sua senha (mín. 6 caracteres)"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
               className="w-full pl-4 pr-10 py-2 rounded-lg border border-gray-200 focus:ring-orange-500 focus:border-orange-500 text-gray-800 bg-gray-50"
             />
             <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-[calc(50%+0.5rem)] -translate-y-1/2 text-gray-400 hover:bg-transparent"
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              type="submit"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg text-lg font-semibold shadow-md transition-colors duration-200"
+              disabled={loading}
             >
-              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {loading ? 'Cadastrando...' : 'Criar Conta'}
             </Button>
           </div>
-          <Button
-            type="submit"
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg text-lg font-semibold shadow-md transition-colors duration-200"
-          >
-            Criar Conta
-          </Button>
+          {error && <div className="text-red-600 text-center">{error}</div>}
+          {success && <div className="text-green-600 text-center">Cadastro realizado! Verifique seu email.</div>}
         </form>
 
         <p className="text-center text-gray-600 mt-8">

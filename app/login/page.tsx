@@ -5,9 +5,29 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { supabase } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  async function handleSignIn(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError(error.message);
+    } else {
+      router.push('/dashboard');
+    }
+    setLoading(false);
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#FDF8F5] p-4">
@@ -21,12 +41,14 @@ export default function LoginPage() {
           <p className="text-gray-600">Entre na sua conta para continuar</p>
         </div>
 
-        <form className="space-y-6">
+        <form onSubmit={handleSignIn} className="space-y-6">
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               type="email"
               placeholder="seu@email.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-orange-500 focus:border-orange-500 text-gray-800 bg-gray-50"
             />
           </div>
@@ -35,6 +57,8 @@ export default function LoginPage() {
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="Sua senha"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
               className="pl-10 pr-10 py-2 rounded-lg border border-gray-200 focus:ring-orange-500 focus:border-orange-500 text-gray-800 bg-gray-50"
             />
             <Button
@@ -51,9 +75,11 @@ export default function LoginPage() {
           <Button
             type="submit"
             className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg text-lg font-semibold shadow-md transition-colors duration-200"
+            disabled={loading}
           >
-            Entrar
+            {loading ? 'Entrando...' : 'Entrar'}
           </Button>
+          {error && <div className="text-red-600 text-center">{error}</div>}
         </form>
 
         <p className="text-center text-gray-600 mt-8">
