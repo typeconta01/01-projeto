@@ -20,8 +20,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { error } = await supabase
     .from('profiles')
     .update({ pagamento_pix: true })
-    .or(`e_mail.eq.${email},taxId.eq.${taxId}`); // ajuste o campo conforme seu banco
+    .eq('email', email);
 
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    console.error('Erro ao atualizar Supabase:', error);
+    return res.status(500).json({ error: error.message });
+  }
   return res.status(200).json({ ok: true });
 } 
