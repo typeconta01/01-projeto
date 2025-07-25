@@ -45,6 +45,11 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#FDF8F5] pb-20">
+      {pixPago && (
+        <div className="mb-4 p-4 bg-green-100 text-green-800 rounded-lg text-center font-semibold shadow">
+          Pagamento via Pix aprovado! Funções liberadas.
+        </div>
+      )}
       {" "}
       {/* pb-20 para dar espaço para a nav inferior */}
       <header className="p-4 bg-white shadow-sm flex items-center justify-between">
@@ -133,7 +138,6 @@ export default function DashboardPage() {
               status="available"
               iconType="book"
             />
-            <div className={`${!pixPago ? 'opacity-50 pointer-events-none select-none' : ''}`}>
             <BookCard
               title="Código Vermelho"
               author="Alexandre Ferreira"
@@ -141,7 +145,6 @@ export default function DashboardPage() {
               price={75.0}
               status="pending"
               iconType="clock"
-                bloqueado={!pixPago}
             />
             <BookCard
               title="O Jardim das Memórias Perdidas"
@@ -150,9 +153,7 @@ export default function DashboardPage() {
               price={125.0}
               status="pending"
               iconType="clock"
-                bloqueado={!pixPago}
             />
-            </div>
           </div>
         </section>
 
