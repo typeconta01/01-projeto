@@ -7,8 +7,7 @@ export async function POST(request: Request) {
 
     const supabase = getSupabaseAdmin();
 
-    const body = await request.json();
-    const requestBody = body?.requestBody;
+    const { requestBody } = await request.json();
 
     console.log('📨 requestBody extraído:', requestBody);
 
