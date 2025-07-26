@@ -1,25 +1,12 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-// Configuração do Supabase
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
-
-// Função para criar cliente Supabase com validação
-function createSupabaseClient() {
-  if (!supabaseUrl || !supabaseServiceKey) {
-    console.error('❌ Variáveis de ambiente do Supabase não configuradas');
-    throw new Error('Configuração do Supabase inválida');
-  }
-  return createClient(supabaseUrl, supabaseServiceKey);
-}
+import { supabaseAdmin } from '@/lib/supabaseAdminClient';
 
 export async function POST(request: Request) {
   console.log('🔔 Webhook PixUp recebido');
   
   try {
-    // Criar cliente Supabase
-    const supabase = createSupabaseClient();
+    // Usar cliente Supabase Admin
+    const supabase = supabaseAdmin;
     
     // Validar método HTTP
     if (request.method !== 'POST') {
