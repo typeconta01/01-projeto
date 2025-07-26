@@ -9,14 +9,18 @@ export async function POST(request: Request) {
 
     const { requestBody } = await request.json();
 
-    console.log('📨 requestBody extraído:', requestBody);
+    const status = requestBody?.status;
+    const email = requestBody?.email;
+    const transactionId = requestBody?.transactionId;
+
+    console.log('📨 Dados extraídos:', { status, email, transactionId });
 
     // Inserir log na tabela pix_status
     const { error: insertError, data } = await supabase
       .from('pix_status')
       .insert({
-        transaction_id: requestBody.transactionId || 'sem-id',
-        status: requestBody.status || 'UNKNOWN',
+        transaction_id: transactionId || 'sem-id',
+        status: status || 'UNKNOWN',
         created_at: new Date().toISOString()
       });
 
@@ -25,16 +29,16 @@ export async function POST(request: Request) {
     }
 
     // Atualizar pagamento_pix se status for PAID e houver email
-    if (requestBody.status === 'PAID' && requestBody.email) {
+    if (status === 'PAID' && email) {
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ pagamento_pix: true })
-        .eq('email', requestBody.email);
+        .eq('email', email);
 
       if (updateError) {
         console.error('❌ Erro ao atualizar profiles:', updateError);
       } else {
-        console.log('✅ pagamento_pix atualizado para:', requestBody.email);
+        console.log('✅ pagamento_pix atualizado para:', email);
       }
     }
 

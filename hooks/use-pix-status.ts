@@ -1,30 +1,62 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { useState, useEffect, useCallback } from 'react';
 
-export function usePixStatus() {
-  const [pixPago, setPixPago] = useState(false);
-  const [loading, setLoading] = useState(true);
+interface PixStatusResponse {
+  success: boolean;
+  status: string;
+  message: string;
+}
+
+export function usePixStatus(txid: string | null, email: string | null, intervalMs: number = 10000) {
+  const [status, setStatus] = useState<'loading' | 'waiting' | 'paid' | 'error'>('loading');
+  const [lastResponse, setLastResponse] = useState<PixStatusResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const checkStatus = useCallback(async () => {
+    if (!txid || !email) {
+      setStatus('error');
+      setError('txid e email são obrigatórios');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/verifica-status?txid=${txid}&email=${email}`);
+      const data: PixStatusResponse = await response.json();
+
+      setLastResponse(data);
+
+      if (data.success) {
+        if (data.status === 'PAID') {
+          setStatus('paid');
+        } else {
+          setStatus('waiting');
+        }
+      } else {
+        setStatus('error');
+        setError(data.message || 'Erro ao verificar status');
+      }
+    } catch (err) {
+      setStatus('error');
+      setError('Erro de conexão');
+      console.error('Erro ao verificar status:', err);
+    }
+  }, [txid, email]);
 
   useEffect(() => {
-    async function fetchStatus() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setPixPago(false);
-        setLoading(false);
-        return;
-      }
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('pagamento_pix')
-        .eq('id', user.id)
-        .single();
-      setPixPago(data?.pagamento_pix === true);
-      setLoading(false);
-    }
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 3000); // Atualiza a cada 3  segundos
-    return () => clearInterval(interval);
-  }, []);
+    if (!txid || !email) return;
 
-  return { pixPago, loading };
+    // Verificação inicial
+    checkStatus();
+
+    // Verificação periódica
+    const interval = setInterval(checkStatus, intervalMs);
+
+    return () => clearInterval(interval);
+  }, [txid, email, intervalMs, checkStatus]);
+
+  return {
+    status,
+    lastResponse,
+    error,
+    checkStatus // Função para verificação manual
+  };
 } 
