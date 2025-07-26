@@ -5,18 +5,22 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// Validação das variáveis de ambiente
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('❌ Variáveis de ambiente do Supabase não configuradas');
-  throw new Error('Configuração do Supabase inválida');
+// Função para criar cliente Supabase com validação
+function createSupabaseClient() {
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('❌ Variáveis de ambiente do Supabase não configuradas');
+    throw new Error('Configuração do Supabase inválida');
+  }
+  return createClient(supabaseUrl, supabaseServiceKey);
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-export async function POST(request) {
+export async function POST(request: Request) {
   console.log('🔔 Webhook PixUp recebido');
   
   try {
+    // Criar cliente Supabase
+    const supabase = createSupabaseClient();
+    
     // Validar método HTTP
     if (request.method !== 'POST') {
       console.log('❌ Método HTTP inválido:', request.method);
@@ -27,7 +31,7 @@ export async function POST(request) {
     }
 
     // Parse do corpo da requisição
-    let body;
+    let body: any;
     try {
       body = await request.json();
     } catch (parseError) {
@@ -127,8 +131,6 @@ export async function POST(request) {
     );
   }
 }
-
-
 
 // Método GET para verificar se o webhook está funcionando
 export async function GET() {
