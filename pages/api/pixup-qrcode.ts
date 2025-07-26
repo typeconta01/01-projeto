@@ -67,7 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           email: email,
         },
         description: descricao || 'Upgrade para Avaliador Internacional',
-        postbackUrl: process.env.NEXT_PUBLIC_PIXUP_WEBHOOK_URL || 'https://seusite.com/api/pixup-webhook',
+        postbackUrl: process.env.PIXUP_WEBHOOK_URL || 'https://higor1-59e5.vercel.app/api/pixup-webhook',
       }),
     });
     if (!pixRes.ok) {
