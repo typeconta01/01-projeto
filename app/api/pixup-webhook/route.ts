@@ -2,118 +2,39 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
 
 export async function POST(request: Request) {
-  console.log('🔔 Webhook PixUp recebido');
-  
   try {
-    // Usar cliente Supabase Admin
+    console.log('🔔 Webhook PixUp recebido');
+
+    // Supabase Admin
     const supabase = getSupabaseAdmin();
-    
-    // Validar método HTTP
-    if (request.method !== 'POST') {
-      console.log('❌ Método HTTP inválido:', request.method);
-      return NextResponse.json(
-        { error: 'Método não permitido' }, 
-        { status: 405 }
-      );
-    }
+    console.log("🔍 Supabase client:", supabase);
 
-    // Parse do corpo da requisição
-    let body: any;
-    try {
-      body = await request.json();
-    } catch (parseError) {
-      console.error('❌ Erro ao fazer parse do JSON:', parseError);
-      return NextResponse.json(
-        { error: 'Corpo da requisição inválido' }, 
-        { status: 400 }
-      );
-    }
-
-    console.log('📦 Dados do webhook:', JSON.stringify(body, null, 2));
-
-    // Validação da estrutura do webhook
-    if (!body || !body.requestBody) {
-      console.log('❌ Webhook inválido - sem requestBody');
-      return NextResponse.json(
-        { error: 'Estrutura do webhook inválida' }, 
-        { status: 400 }
-      );
-    }
-
-    const { requestBody } = body;
-
-    // Validação dos campos obrigatórios
-    if (!requestBody.transactionId || !requestBody.status) {
-      console.log('❌ Campos obrigatórios ausentes');
-      return NextResponse.json(
-        { error: 'Campos obrigatórios ausentes' }, 
-        { status: 400 }
-      );
-    }
-
-    console.log('📋 Dados da transação:', JSON.stringify(requestBody, null, 2));
-
-    // Verificar se é uma transação PIX válida
-    if (requestBody.transactionType !== 'RECEIVEPIX') {
-      console.log('⚠️ Tipo de transação não suportado:', requestBody.transactionType);
-      return NextResponse.json(
-        { error: 'Tipo de transação não suportado' }, 
-        { status: 400 }
-      );
-    }
-
-    // Salvar dados na tabela pix_status
-    const { error: insertError } = await supabase
+    // Teste simples de insert fixo
+    const { error: insertError, data } = await supabase
       .from('pix_status')
       .insert({
-        transaction_id: requestBody.transactionId,
-        status: requestBody.status,
+        transaction_id: "teste-error-debug",
+        status: "TEST",
         created_at: new Date().toISOString()
       });
+
+    console.log("🧪 Insert result:", { data, insertError });
 
     if (insertError) {
       console.error('❌ Erro ao salvar na tabela pix_status:', insertError);
       return NextResponse.json(
-        { error: 'Erro ao salvar dados' }, 
+        { error: 'Erro ao salvar dados', detalhe: insertError.message },
         { status: 500 }
       );
     }
 
-    console.log('✅ Dados salvos na tabela pix_status:', {
-      transaction_id: requestBody.transactionId,
-      status: requestBody.status
-    });
-
-    // Processar baseado no status da transação (opcional - para compatibilidade)
-    switch (requestBody.status) {
-      case 'PAID':
-        console.log('✅ Pagamento confirmado:', requestBody.transactionId);
-        break;
-        
-      case 'PENDING':
-        console.log('⏳ Pagamento pendente:', requestBody.transactionId);
-        break;
-        
-      case 'EXPIRED':
-        console.log('⏰ Pagamento expirado:', requestBody.transactionId);
-        break;
-        
-      case 'CANCELLED':
-        console.log('❌ Pagamento cancelado:', requestBody.transactionId);
-        break;
-        
-      default:
-        console.log('⚠️ Status não tratado:', requestBody.status);
-        break;
-    }
-
-    console.log('✅ Webhook processado com sucesso');
-    return NextResponse.json({ message: "OK" }, { status: 200 });
+    console.log('✅ Dados inseridos com sucesso (teste)');
+    return NextResponse.json({ message: "OK (teste de insert)" }, { status: 200 });
 
   } catch (error) {
-    console.error('💥 Erro ao processar webhook:', error);
+    console.error('💥 Erro geral no webhook:', error);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Erro interno do servidor', detalhe: (error as Error).message },
       { status: 500 }
     );
   }
