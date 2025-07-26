@@ -34,18 +34,29 @@ export async function POST(request: Request) {
 
     console.log('✅ Dados inseridos com sucesso (teste)');
 
-    // Atualizar pagamento_pix se status for PAID e houver email
-    if (requestBody.status === 'PAID' && requestBody.email) {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ pagamento_pix: true })
-        .eq('email', requestBody.email);
+    // Lógica baseada no status recebido
+    switch (requestBody.status) {
+      case 'PAID':
+        console.log('✅ Pagamento confirmado:', requestBody.transactionId);
 
-      if (updateError) {
-        console.error('❌ Erro ao atualizar profiles:', updateError);
-      } else {
-        console.log(`✅ pagamento_pix atualizado para ${requestBody.email}`);
-      }
+        if (requestBody.email) {
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ pagamento_pix: true })
+            .eq('email', requestBody.email);
+
+          if (updateError) {
+            console.error('❌ Erro ao atualizar pagamento_pix em profiles:', updateError);
+          } else {
+            console.log('✅ Campo pagamento_pix atualizado com sucesso para:', requestBody.email);
+          }
+        } else {
+          console.warn('⚠️ Email não fornecido no requestBody. Não foi possível atualizar profiles.');
+        }
+        break;
+      default:
+        console.log('ℹ️ Status recebido não requer ação especial:', requestBody.status);
+        break;
     }
 
     return NextResponse.json({ message: "OK (teste de insert)" }, { status: 200 });
