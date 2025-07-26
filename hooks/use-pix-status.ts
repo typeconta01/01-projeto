@@ -22,7 +22,7 @@ export function usePixStatus() {
       setLoading(false);
     }
     fetchStatus();
-    const interval = setInterval(fetchStatus, 3000); // Atualiza a cada 3 segundos
+    const interval = setInterval(fetchStatus, 3000); // Atualiza a cada 3  segundos
     return () => clearInterval(interval);
   }, []);
 
