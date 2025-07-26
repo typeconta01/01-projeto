@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     const transactionId = requestBody?.transactionId;
 
     console.log('📩 Dados recebidos:', { status, email, normalizedEmail, transactionId });
+    console.log('🔍 requestBody completo:', JSON.stringify(requestBody, null, 2));
 
     // Inserir log na tabela pix_status
     const { error: insertError, data } = await supabase
