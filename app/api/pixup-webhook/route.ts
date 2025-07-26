@@ -9,6 +9,10 @@ export async function POST(request: Request) {
     const supabase = getSupabaseAdmin();
     console.log("🔍 Supabase client:", supabase);
 
+    // Obter o corpo da requisição
+    const requestBody = await request.json();
+    console.log('📨 Request body:', requestBody);
+
     // Teste simples de insert fixo
     const { error: insertError, data } = await supabase
       .from('pix_status')
@@ -29,6 +33,21 @@ export async function POST(request: Request) {
     }
 
     console.log('✅ Dados inseridos com sucesso (teste)');
+
+    // Atualizar pagamento_pix se status for PAID e houver email
+    if (requestBody.status === 'PAID' && requestBody.email) {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ pagamento_pix: true })
+        .eq('email', requestBody.email);
+
+      if (updateError) {
+        console.error('❌ Erro ao atualizar profiles:', updateError);
+      } else {
+        console.log(`✅ pagamento_pix atualizado para ${requestBody.email}`);
+      }
+    }
+
     return NextResponse.json({ message: "OK (teste de insert)" }, { status: 200 });
 
   } catch (error) {
