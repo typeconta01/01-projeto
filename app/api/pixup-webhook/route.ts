@@ -7,11 +7,12 @@ export async function POST(request: Request) {
 
     const supabase = getSupabaseAdmin();
 
-    const body = await request.json();
+    const json = await request.json();
+    const requestBody = json?.requestBody;
 
-    const status = body?.status;
-    const email = body?.email?.trim().toLowerCase(); // Normaliza o email
-    const transactionId = body?.transactionId;
+    const status = requestBody?.status;
+    const email = requestBody?.email?.trim().toLowerCase(); // Normaliza o email
+    const transactionId = requestBody?.transactionId;
 
     console.log('📩 Dados recebidos:', { status, email, transactionId });
 
