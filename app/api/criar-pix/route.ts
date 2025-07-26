@@ -36,6 +36,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Preparar payload para PixUp
+    const pixupPayload = {
+      email: body.payer.email, // Campo adicional no nível raiz
+      payer: {
+        email: body.payer.email,
+        name: body.payer.name
+      },
+      debtor: {
+        email: body.payer.email // Campo adicional para garantir
+      },
+      value: body.value,
+      description: body.description,
+      postbackUrl: body.postbackUrl || `${request.nextUrl.origin}/api/pixup-webhook`
+    };
+
+    console.log('📤 Payload enviado para PixUp:', JSON.stringify(pixupPayload, null, 2));
+
     // Criar cobrança na PixUp
     const pixupResponse = await fetch('https://api.pixupbr.com/v2/qr-code', {
       method: 'POST',
@@ -43,15 +60,7 @@ export async function POST(request: NextRequest) {
         'Authorization': `Bearer ${tokenData.token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        payer: {
-          email: body.payer.email,
-          name: body.payer.name
-        },
-        value: body.value,
-        description: body.description,
-        postbackUrl: body.postbackUrl || `${request.nextUrl.origin}/api/pixup-webhook`
-      })
+      body: JSON.stringify(pixupPayload)
     });
 
     const pixupData = await pixupResponse.json();

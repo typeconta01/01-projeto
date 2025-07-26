@@ -7,13 +7,14 @@ export async function POST(request: Request) {
 
     const supabase = getSupabaseAdmin();
 
-    const { requestBody } = await request.json();
+    const requestBody = await request.json();
 
     const status = requestBody?.status;
     const email = requestBody?.email;
     const transactionId = requestBody?.transactionId;
 
     console.log('📨 Dados extraídos:', { status, email, transactionId });
+    console.log("📦 Webhook recebido:", JSON.stringify(requestBody, null, 2));
 
     // Inserir log na tabela pix_status
     const { error: insertError, data } = await supabase
