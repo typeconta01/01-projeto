@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdminClient';
+import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
 
 export async function POST(request: Request) {
   console.log('🔔 Webhook PixUp recebido');
   
   try {
     // Usar cliente Supabase Admin
-    const supabase = supabaseAdmin;
+    const supabase = getSupabaseAdmin();
     
     // Validar método HTTP
     if (request.method !== 'POST') {
