@@ -48,6 +48,10 @@ export async function POST(request: NextRequest) {
       },
       value: body.value,
       description: body.description,
+      external_id: body.payer.email, // Email como external_id
+      metadata: {
+        email: body.payer.email // Email como metadata
+      },
       postbackUrl: body.postbackUrl || `${request.nextUrl.origin}/api/pixup-webhook`
     };
 

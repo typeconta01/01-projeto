@@ -11,10 +11,11 @@ export async function POST(request: Request) {
     const requestBody = json?.requestBody;
 
     const status = requestBody?.status;
-    const email = requestBody?.email?.trim().toLowerCase(); // Normaliza o email
+    const email = requestBody?.metadata?.email || requestBody?.external_id || requestBody?.email;
+    const normalizedEmail = email?.trim().toLowerCase(); // Normaliza o email
     const transactionId = requestBody?.transactionId;
 
-    console.log('📩 Dados recebidos:', { status, email, transactionId });
+    console.log('📩 Dados recebidos:', { status, email, normalizedEmail, transactionId });
 
     // Inserir log na tabela pix_status
     const { error: insertError, data } = await supabase
@@ -30,17 +31,19 @@ export async function POST(request: Request) {
     }
 
     // Atualizar pagamento_pix se status for PAID e houver email
-    if (status === 'PAID' && email) {
+    if (status === 'PAID' && normalizedEmail) {
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ pagamento_pix: true })
-        .eq('email', email);
+        .eq('email', normalizedEmail);
 
       if (updateError) {
         console.error('❌ Erro ao atualizar profiles:', updateError);
       } else {
-        console.log('✅ pagamento_pix atualizado para:', email);
+        console.log('✅ pagamento_pix atualizado para:', normalizedEmail);
       }
+    } else if (status === 'PAID' && !normalizedEmail) {
+      console.warn('⚠️ Status PAID recebido, mas email não encontrado em metadata, external_id ou email');
     }
 
     return NextResponse.json({ message: "OK (Webhook processado)" }, { status: 200 });
