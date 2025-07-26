@@ -32,6 +32,20 @@ export async function POST(request: Request) {
       );
     }
 
+    // Atualizar pagamento_pix logo após o insert, se status for PAID e houver email
+    if (requestBody.status === 'PAID' && requestBody.email) {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ pagamento_pix: true })
+        .eq('email', requestBody.email);
+
+      if (updateError) {
+        console.error('❌ Erro ao atualizar pagamento_pix:', updateError);
+      } else {
+        console.log('✅ pagamento_pix atualizado para o email:', requestBody.email);
+      }
+    }
+
     console.log('✅ Dados inseridos com sucesso (teste)');
 
     // Lógica baseada no status recebido
