@@ -24,10 +24,13 @@ export function usePaymentStatus(intervalMs: number = 3000) {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session?.access_token) {
+        console.log('❌ Sem token de sessão');
         setStatus('error');
         setError('Usuário não autenticado');
         return;
       }
+
+      console.log('🔍 Verificando status do pagamento...');
 
       // Fazer requisição para a API
       const response = await fetch('/api/verifica-pagamento', {
@@ -36,26 +39,34 @@ export function usePaymentStatus(intervalMs: number = 3000) {
         }
       });
 
+      console.log('📡 Resposta da API:', response.status);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Erro HTTP:', response.status, errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data: PaymentStatusResponse = await response.json();
+      console.log('📊 Dados recebidos:', data);
 
       if (data.success) {
         setEmail(data.email);
         
         if (data.pagamentoConfirmado) {
+          console.log('✅ Pagamento confirmado!');
           setStatus('paid');
         } else {
+          console.log('⏳ Aguardando pagamento...');
           setStatus('waiting');
         }
       } else {
+        console.error('❌ Erro na resposta:', data);
         setStatus('error');
         setError('Erro ao verificar pagamento');
       }
     } catch (err) {
-      console.error('Erro ao verificar status:', err);
+      console.error('💥 Erro ao verificar status:', err);
       setStatus('error');
       setError('Erro de conexão');
     }

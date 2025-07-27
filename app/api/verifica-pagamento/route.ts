@@ -32,12 +32,27 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Verificando pagamento para:', user.email);
 
-    // Consultar status do pagamento
-    const { data, error } = await supabase
+    // Consultar status do pagamento (tenta por email primeiro, depois por id)
+    let { data, error } = await supabase
       .from('profiles')
-      .select('pagamento_pix')
+      .select('pagamento_pix, id, email')
       .eq('email', user.email)
       .single();
+
+    // Se não encontrar por email, tenta por user.id
+    if (error && user.id) {
+      console.log('🔍 Tentando buscar por user.id:', user.id);
+      const { data: dataById, error: errorById } = await supabase
+        .from('profiles')
+        .select('pagamento_pix, id, email')
+        .eq('id', user.id)
+        .single();
+      
+      if (!errorById) {
+        data = dataById;
+        error = null;
+      }
+    }
 
     if (error) {
       console.error('❌ Erro ao consultar pagamento:', error);

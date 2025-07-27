@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { usePaymentStatus } from '@/hooks/use-payment-status'
 
 interface PaymentStatusSimpleProps {
@@ -14,12 +15,15 @@ export default function PaymentStatusSimple({
   const { status, email, error } = usePaymentStatus(intervalMs)
 
   // Executar callback quando pagamento for confirmado
-  if (status === 'paid' && onPaymentConfirmed) {
-    // Usar setTimeout para evitar múltiplas execuções
-    setTimeout(() => {
-      onPaymentConfirmed()
-    }, 100)
-  }
+  useEffect(() => {
+    if (status === 'paid' && onPaymentConfirmed) {
+      const timeout = setTimeout(() => {
+        onPaymentConfirmed()
+      }, 100)
+
+      return () => clearTimeout(timeout)
+    }
+  }, [status, onPaymentConfirmed])
 
   const renderStatus = () => {
     switch (status) {

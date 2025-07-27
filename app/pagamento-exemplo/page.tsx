@@ -1,7 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { createClient } from '@supabase/supabase-js'
 import PaymentStatusSimple from '@/components/payment-status-simple'
+import { ensureProfileExists } from '@/lib/profile-utils'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 export default function PagamentoExemplo() {
   const [qrCodeGerado, setQrCodeGerado] = useState(false)
@@ -9,6 +16,17 @@ export default function PagamentoExemplo() {
 
   const handleGerarPix = async () => {
     try {
+      // Obter usuário logado
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user?.email) {
+        alert('Usuário não autenticado')
+        return
+      }
+
+      // Garantir que o perfil existe antes de gerar o PIX
+      await ensureProfileExists(user.email, user.id)
+
       const response = await fetch('/api/criar-pix', {
         method: 'POST',
         headers: {
@@ -16,8 +34,8 @@ export default function PagamentoExemplo() {
         },
         body: JSON.stringify({
           payer: {
-            email: 'teste@exemplo.com',
-            name: 'Usuário Teste'
+            email: user.email,
+            name: user.user_metadata?.full_name || 'Usuário'
           },
           value: 0.01,
           description: 'Pagamento de teste'
@@ -33,7 +51,8 @@ export default function PagamentoExemplo() {
         alert('Erro ao gerar PIX: ' + data.error)
       }
     } catch (error) {
-      alert('Erro ao gerar PIX')
+      console.error('Erro ao gerar PIX:', error)
+      alert('Erro ao gerar PIX: ' + (error as Error).message)
     }
   }
 
