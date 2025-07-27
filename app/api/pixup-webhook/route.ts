@@ -46,6 +46,22 @@ export async function POST(request: Request) {
       } else {
         console.log('✅ pagamento_pix atualizado para:', normalizedEmail);
       }
+
+      // Salvar na tabela pagamentos
+      const { error: pagamentoError } = await supabase
+        .from('pagamentos')
+        .insert({
+          email: normalizedEmail,
+          transaction_id: transactionId,
+          status: status,
+          created_at: new Date().toISOString()
+        });
+
+      if (pagamentoError) {
+        console.error('❌ Erro ao salvar na tabela pagamentos:', pagamentoError);
+      } else {
+        console.log('✅ Pagamento salvo na tabela pagamentos para:', normalizedEmail);
+      }
     } else if (status === 'PAID' && !normalizedEmail) {
       console.warn('⚠️ Status PAID recebido, mas email não encontrado em metadata, external_id ou email');
     }
