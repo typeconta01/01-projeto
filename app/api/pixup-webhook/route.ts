@@ -11,7 +11,10 @@ export async function POST(request: Request) {
     const requestBody = json?.requestBody;
 
     const status = requestBody?.status;
-    const email = requestBody?.metadata?.email || requestBody?.external_id || requestBody?.email;
+    const email = requestBody?.email || 
+                  requestBody?.metadata?.email || 
+                  requestBody?.external_id || 
+                  requestBody?.creditParty?.email;
     const normalizedEmail = email?.trim().toLowerCase(); // Normaliza o email
     const transactionId = requestBody?.transactionId;
 
