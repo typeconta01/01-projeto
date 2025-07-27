@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import PixPaymentStatus from '@/components/pix-payment-status'
+import PaymentStatusSimple from '@/components/payment-status-simple'
 
 export default function PagamentoExemplo() {
   const [qrCodeGerado, setQrCodeGerado] = useState(false)
@@ -79,10 +79,9 @@ export default function PagamentoExemplo() {
           </div>
 
           {/* Componente de verificação de status */}
-          <PixPaymentStatus 
+          <PaymentStatusSimple 
             intervalMs={3000} // Verifica a cada 3 segundos
             onPaymentConfirmed={handlePagamentoConfirmado}
-            showLoading={true}
           />
 
           <div className="text-center">
