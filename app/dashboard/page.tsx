@@ -47,10 +47,14 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#FDF8F5] pb-20">
       {pixPago && (
         <div className="mb-4 p-4 bg-green-100 text-green-800 rounded-lg text-center font-semibold shadow">
-          Pagamento via Pix aprovado! Funções liberadas.
+          ✅ Pagamento via PIX aprovado! Livros liberados.
         </div>
       )}
-      {" "}
+      {!pixPago && !loadingPix && (
+        <div className="mb-4 p-4 bg-orange-100 text-orange-800 rounded-lg text-center font-semibold shadow">
+          🔒 Faça o pagamento PIX para desbloquear todos os livros
+        </div>
+      )}
       {/* pb-20 para dar espaço para a nav inferior */}
       <header className="p-4 bg-white shadow-sm flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -137,22 +141,25 @@ export default function DashboardPage() {
               price={1.0}
               status="available"
               iconType="book"
+              bloqueado={false} // Sempre disponível
             />
             <BookCard
               title="Código Vermelho"
               author="Alexandre Ferreira"
               genre="Thriller Tecnológico"
               price={75.0}
-              status="pending"
-              iconType="clock"
+              status={pixPago ? "available" : "pending"}
+              iconType={pixPago ? "book" : "clock"}
+              bloqueado={!pixPago} // Bloqueado se não pagou PIX
             />
             <BookCard
               title="O Jardim das Memórias Perdidas"
               author="Clara Monteiro"
               genre="Romance Contemporâneo"
               price={125.0}
-              status="pending"
-              iconType="clock"
+              status={pixPago ? "available" : "pending"}
+              iconType={pixPago ? "book" : "clock"}
+              bloqueado={!pixPago} // Bloqueado se não pagou PIX
             />
           </div>
         </section>
