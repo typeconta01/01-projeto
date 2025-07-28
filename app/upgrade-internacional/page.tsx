@@ -170,7 +170,7 @@ export default function UpgradeInternacional() {
                 {loading ? 'Gerando PIX...' : 'Fazer Upgrade com PIX'}
               </Button>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-4">
                     Escaneie o QR Code ou copie o código abaixo e pague no app do seu banco.
@@ -201,12 +201,17 @@ export default function UpgradeInternacional() {
                   )}
                 </div>
 
-                {/* Status do Pagamento */}
+                {/* Status do Pagamento - Agora mais integrado */}
                 {showPaymentStatus && (
-                  <PaymentStatusSimple 
-                    intervalMs={3000}
-                    onPaymentConfirmed={handlePaymentConfirmed}
-                  />
+                  <div className="border-t pt-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+                      Status do Pagamento
+                    </h3>
+                    <PaymentStatusSimple 
+                      intervalMs={3000}
+                      onPaymentConfirmed={handlePaymentConfirmed}
+                    />
+                  </div>
                 )}
               </div>
             )}
