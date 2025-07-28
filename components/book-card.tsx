@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Book, Star, Hourglass, Clock, Lock } from "lucide-react"
 import Link from "next/link"
+import { EvaluatorModeDialog } from "@/components/evaluator-mode-dialog"
 
 interface BookCardProps {
   title: string
@@ -47,12 +48,12 @@ export default function BookCard({
                 <Lock className="w-5 h-5" />
                 Livro bloqueado
               </div>
-              <Link href="/pagamento-exemplo" passHref>
+              <EvaluatorModeDialog>
                 <Button className="bg-orange-500 hover:bg-orange-600 text-white rounded-md px-4 py-2 text-sm w-full">
                   <Lock className="w-4 h-4 mr-2" />
                   Fazer Pagamento PIX
                 </Button>
-              </Link>
+              </EvaluatorModeDialog>
             </div>
           ) : status === "pending" ? (
             <div className="flex items-center text-sm text-gray-500 mt-2">
