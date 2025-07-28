@@ -27,6 +27,7 @@ export async function POST(request: Request) {
       .insert({
         transaction_id: transactionId || 'sem-id',
         status: status || 'UNKNOWN',
+        email: normalizedEmail || email || null, // Adicionado campo email
         created_at: new Date().toISOString()
       });
 
