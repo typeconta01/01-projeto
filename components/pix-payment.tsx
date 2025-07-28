@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
-import { X, DollarSign } from "lucide-react";
+import { X, DollarSign, Copy } from "lucide-react";
 
 export function PixPayment() {
   const [loading, setLoading] = useState(false);
@@ -31,6 +31,8 @@ export function PixPayment() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: userEmail,
+          valor: 39.99, // Valor do upgrade para Avaliador Internacional
+          descricao: "Upgrade para Avaliador Internacional"
         }),
       });
       const data = await res.json();
@@ -73,6 +75,7 @@ export function PixPayment() {
             </div>
             <div className="mb-2 w-full text-center">
               <div className="text-xl font-bold text-gray-900">Pagamento via PIX</div>
+              <div className="text-lg font-semibold text-blue-600 mt-1">R$ 39,99</div>
             </div>
             <p className="text-gray-700 text-sm mb-2 text-center">Escaneie o QR Code ou copie o código abaixo e pague no app do seu banco.</p>
             {copiaCola && (
@@ -90,6 +93,7 @@ export function PixPayment() {
               style={{ resize: 'none' }}
             />
             <Button onClick={handleCopy} className="w-full mb-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
+              <Copy className="w-4 h-4 mr-2" />
               {copied ? "Copiado!" : "Copiar código PIX"}
             </Button>
           </div>

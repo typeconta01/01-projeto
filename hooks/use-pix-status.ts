@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 export function usePixStatus() {
   const [pixPago, setPixPago] = useState(false);
+  const [upgradePago, setUpgradePago] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,19 +19,20 @@ export function usePixStatus() {
 
         const { data, error } = await supabase
           .from('profiles')
-          .select('pagamento_pix')
+          .select('pagamento_pix, upgrade_internacional')
           .eq('email', user.email)
           .single();
 
         if (error) {
-          console.error('Erro ao verificar pagamento PIX:', error);
+          console.error('Erro ao verificar pagamentos:', error);
           setError(error.message);
         } else {
           setPixPago(data?.pagamento_pix === true);
+          setUpgradePago(data?.upgrade_internacional === true);
         }
       } catch (err) {
-        console.error('Erro ao verificar pagamento PIX:', err);
-        setError('Erro ao verificar status do pagamento');
+        console.error('Erro ao verificar pagamentos:', err);
+        setError('Erro ao verificar status dos pagamentos');
       } finally {
         setLoading(false);
       }
@@ -44,5 +46,5 @@ export function usePixStatus() {
     return () => clearInterval(interval);
   }, []);
 
-  return { pixPago, loading, error };
+  return { pixPago, upgradePago, loading, error };
 } 

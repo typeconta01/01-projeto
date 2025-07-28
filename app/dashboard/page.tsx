@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { User, Settings, ArrowRight, DollarSign, Zap, Trophy, Star, Gamepad, Eye, Book } from "lucide-react"
+import { User, Settings, ArrowRight, DollarSign, Zap, Trophy, Star, Gamepad, Eye, Book, Globe, Lock } from "lucide-react"
 import BottomNav from "@/components/bottom-nav"
 import BookCard from "@/components/book-card"
 import Link from "next/link"
@@ -16,7 +16,7 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState("Carregando...")
   const [userLevel, setUserLevel] = useState("Nível bronze")
   const [loading, setLoading] = useState(true)
-  const { pixPago, loading: loadingPix } = usePixStatus();
+  const { pixPago, upgradePago, loading: loadingPix } = usePixStatus();
 
   useEffect(() => {
     async function getUserData() {
@@ -45,14 +45,19 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#FDF8F5] pb-20">
-      {pixPago && (
+      {pixPago && !upgradePago && (
         <div className="mb-4 p-4 bg-green-100 text-green-800 rounded-lg text-center font-semibold shadow">
-          ✅ Pagamento via PIX aprovado! Livros liberados.
+          ✅ Pagamento básico aprovado! Livros nacionais liberados.
+        </div>
+      )}
+      {upgradePago && (
+        <div className="mb-4 p-4 bg-blue-100 text-blue-800 rounded-lg text-center font-semibold shadow">
+          🌍 Upgrade para Avaliador Internacional ativado! Todos os livros liberados.
         </div>
       )}
       {!pixPago && !loadingPix && (
         <div className="mb-4 p-4 bg-orange-100 text-orange-800 rounded-lg text-center font-semibold shadow">
-          🔒 Faça o pagamento PIX para desbloquear todos os livros
+          🔒 Faça o pagamento PIX para desbloquear os livros
         </div>
       )}
       {/* pb-20 para dar espaço para a nav inferior */}
@@ -66,7 +71,7 @@ export default function DashboardPage() {
             <h2 className="font-semibold text-gray-900">{userName}</h2>
             <p className="text-sm text-gray-600 flex items-center gap-1">
               <User className="w-3 h-3" />
-              {userLevel}
+              {upgradePago ? "Avaliador Internacional" : "Avaliador Nacional"}
             </p>
           </div>
         </div>
@@ -150,7 +155,7 @@ export default function DashboardPage() {
               price={75.0}
               status={pixPago ? "available" : "pending"}
               iconType={pixPago ? "book" : "clock"}
-              bloqueado={!pixPago} // Bloqueado se não pagou PIX
+              bloqueado={!pixPago} // Bloqueado se não pagou PIX básico
             />
             <BookCard
               title="O Jardim das Memórias Perdidas"
@@ -159,10 +164,73 @@ export default function DashboardPage() {
               price={125.0}
               status={pixPago ? "available" : "pending"}
               iconType={pixPago ? "book" : "clock"}
-              bloqueado={!pixPago} // Bloqueado se não pagou PIX
+              bloqueado={!pixPago} // Bloqueado se não pagou PIX básico
             />
           </div>
         </section>
+
+        {/* Seção de Livros Internacionais (só aparece se fez upgrade) */}
+        {upgradePago && (
+          <section className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Globe className="w-5 h-5 text-blue-500" />
+                Livros Internacionais
+              </div>
+              <span className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Premium</span>
+            </h2>
+            <div className="space-y-4">
+              <BookCard
+                title="The Quantum Garden"
+                author="Derek Künsken"
+                genre="Science Fiction"
+                price={150.0}
+                status="available"
+                iconType="book"
+                bloqueado={false}
+              />
+              <BookCard
+                title="The Midnight Library"
+                author="Matt Haig"
+                genre="Contemporary Fiction"
+                price={200.0}
+                status="available"
+                iconType="book"
+                bloqueado={false}
+              />
+            </div>
+          </section>
+        )}
+
+        {/* Seção de Upgrade (só aparece se não fez upgrade) */}
+        {!upgradePago && pixPago && (
+          <section className="mb-8">
+            <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200">
+              <CardContent className="p-0">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                    <Globe className="w-8 h-8 text-blue-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Upgrade para Avaliador Internacional</h3>
+                  <p className="text-gray-600 mb-4">
+                    Acesse livros em inglês e receba pagamentos em dólares. Expanda seus horizontes!
+                  </p>
+                  <div className="bg-white rounded-lg p-4 mb-4">
+                    <p className="text-sm text-gray-600">Taxa de upgrade:</p>
+                    <p className="text-2xl font-bold text-blue-600">R$ 39,99</p>
+                    <p className="text-xs text-gray-500">Pagamento único via PIX</p>
+                  </div>
+                  <Link href="/upgrade-internacional" passHref>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-3">
+                      <Globe className="w-4 h-4 mr-2" />
+                      Fazer Upgrade
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* Explorar Seções */}
         <section className="mb-8">

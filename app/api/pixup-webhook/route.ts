@@ -17,8 +17,9 @@ export async function POST(request: Request) {
                   requestBody?.creditParty?.email;
     const normalizedEmail = email?.trim().toLowerCase(); // Normaliza o email
     const transactionId = requestBody?.transactionId;
+    const amount = requestBody?.amount || 0; // Valor do pagamento
 
-    console.log('📩 Dados recebidos:', { status, email, normalizedEmail, transactionId });
+    console.log('📩 Dados recebidos:', { status, email, normalizedEmail, transactionId, amount });
     console.log('🔍 requestBody completo:', JSON.stringify(requestBody, null, 2));
 
     // Inserir log na tabela pix_status
@@ -37,15 +38,33 @@ export async function POST(request: Request) {
 
     // Atualizar pagamento_pix se status for PAID e houver email
     if (status === 'PAID' && normalizedEmail) {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ pagamento_pix: true })
-        .eq('email', normalizedEmail);
+      // Determinar o tipo de pagamento baseado no valor
+      const isUpgradePayment = amount >= 39.99; // Pagamento de upgrade para Avaliador Internacional
+      
+      if (isUpgradePayment) {
+        // Atualizar upgrade_internacional
+        const { error: upgradeError } = await supabase
+          .from('profiles')
+          .update({ upgrade_internacional: true })
+          .eq('email', normalizedEmail);
 
-      if (updateError) {
-        console.error('❌ Erro ao atualizar profiles:', updateError);
+        if (upgradeError) {
+          console.error('❌ Erro ao atualizar upgrade_internacional:', upgradeError);
+        } else {
+          console.log('✅ upgrade_internacional atualizado para:', normalizedEmail);
+        }
       } else {
-        console.log('✅ pagamento_pix atualizado para:', normalizedEmail);
+        // Atualizar pagamento_pix (pagamento básico)
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ pagamento_pix: true })
+          .eq('email', normalizedEmail);
+
+        if (updateError) {
+          console.error('❌ Erro ao atualizar profiles:', updateError);
+        } else {
+          console.log('✅ pagamento_pix atualizado para:', normalizedEmail);
+        }
       }
 
       // Salvar na tabela pagamentos
@@ -55,6 +74,8 @@ export async function POST(request: Request) {
           email: normalizedEmail,
           transaction_id: transactionId,
           status: status,
+          amount: amount,
+          tipo: isUpgradePayment ? 'upgrade' : 'basico',
           created_at: new Date().toISOString()
         });
 
