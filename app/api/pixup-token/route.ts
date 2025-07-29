@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const clientId = 'gomes333_6757351846';
-  const clientSecret = 'e97a2f98706c0abfc096b30c354b4b03becc42dfb6182ca8eb4fe9706acdb1b0';
+  const clientId = process.env.PIXUP_CLIENT_ID as string;
+  const clientSecret = process.env.PIXUP_CLIENT_SECRET as string;
+
+  if (!clientId || !clientSecret) {
+    return NextResponse.json(
+      { error: 'PixUp credentials not configured' },
+      { status: 500 }
+    );
+  }
 
   const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 

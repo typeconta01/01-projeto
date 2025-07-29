@@ -26,7 +26,7 @@ export default function SaquePage() {
         <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
           <ArrowLeft className="w-6 h-6" />
         </Link>
-        <h1 className="text-xl font-bold text-gray-800"> 1rea de Saque</h1>
+        <h1 className="text-xl font-bold text-gray-800">Área de Saque</h1>
         <button onClick={handleRefresh} className="text-gray-600 hover:text-gray-900">
           <RefreshCw className="w-6 h-6" />
         </button>

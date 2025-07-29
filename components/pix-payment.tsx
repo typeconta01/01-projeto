@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { X, DollarSign, Copy } from "lucide-react";
+import PaymentStatusSimple from "@/components/payment-status-simple";
 
 export function PixPayment() {
   const [loading, setLoading] = useState(false);
@@ -96,6 +97,18 @@ export function PixPayment() {
               <Copy className="w-4 h-4 mr-2" />
               {copied ? "Copiado!" : "Copiar código PIX"}
             </Button>
+            <div className="w-full mt-4">
+              <PaymentStatusSimple
+                intervalMs={4000}
+                onPaymentConfirmed={() => {
+                  alert('✅ Pix pago! Você será redirecionado para o dashboard.');
+                  setOpen(false);
+                  setTimeout(() => {
+                    window.location.href = '/dashboard';
+                  }, 1000);
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

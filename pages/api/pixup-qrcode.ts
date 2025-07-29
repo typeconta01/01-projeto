@@ -1,7 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-const PIXUP_CLIENT_ID = process.env.PIXUP_CLIENT_ID || 'gomes333_6757351846';
-const PIXUP_CLIENT_SECRET = process.env.PIXUP_CLIENT_SECRET || 'e97a2f98706c0abfc096b30c354b4b03becc42dfb6182ca8eb4fe9706acdb1b0';
+const PIXUP_CLIENT_ID = process.env.PIXUP_CLIENT_ID as string;
+const PIXUP_CLIENT_SECRET = process.env.PIXUP_CLIENT_SECRET as string;
+
+if (!PIXUP_CLIENT_ID || !PIXUP_CLIENT_SECRET) {
+  throw new Error('PixUp credentials not configured');
+}
 
 function gerarCpfFake() {
   let cpf = '';
