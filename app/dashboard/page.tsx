@@ -55,11 +55,6 @@ export default function DashboardPage() {
           🌍 Upgrade para Avaliador Internacional ativado! Todos os livros liberados.
         </div>
       )}
-      {!pixPago && !loadingPix && (
-        <div className="mb-4 p-4 bg-orange-100 text-orange-800 rounded-lg text-center font-semibold shadow">
-          🔒 Faça o pagamento PIX para desbloquear os livros
-        </div>
-      )}
       {/* pb-20 para dar espaço para a nav inferior */}
       <header className="p-4 bg-white shadow-sm flex items-center justify-between">
         <div className="flex items-center gap-3">
