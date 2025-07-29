@@ -1,4 +1,3 @@
-// Comentário de teste para commit automático
 'use client'
 
 import { useEffect, useRef } from 'react'

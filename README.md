@@ -28,3 +28,34 @@ Continue building your app on:
 2. Deploy your chats from the v0 interface
 3. Changes are automatically pushed to this repository
 4. Vercel deploys the latest version from this repository
+
+## Local Development
+
+1. Install dependencies using **pnpm** or **npm**:
+
+   ```bash
+   pnpm install
+   # or
+   npm install
+   ```
+
+2. Create a `.env.local` file with the following variables:
+
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+   SUPABASE_SERVICE_ROLE_KEY=<your-supabase-service-role-key>
+   PIXUP_CLIENT_ID=<your-pixup-client-id>
+   PIXUP_CLIENT_SECRET=<your-pixup-client-secret>
+   PIXUP_WEBHOOK_URL=<public-webhook-url>
+   ```
+
+3. Run the development server:
+
+   ```bash
+   pnpm dev
+   # or
+   npm run dev
+   ```
+
+The app will be available at `http://localhost:3000`.
