@@ -26,17 +26,14 @@ export function PixPayment() {
     if (statusPix !== "aguardando" || !userEmail) return;
 
     const interval = setInterval(async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("pagamento_pix")
-        .eq("email", userEmail)
-        .single();
+      const res = await fetch(`/api/verifica-status?email=${userEmail}`);
+      const data = await res.json();
 
-      if (data?.pagamento_pix === true) {
+      if (data.status === "PAID") {
         setStatusPix("confirmado");
         clearInterval(interval);
       }
-    }, 2000); // verifica a cada 2 segundos
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [statusPix, userEmail]);
@@ -126,7 +123,6 @@ export function PixPayment() {
               {copied ? "Copiado!" : "Copiar código PIX"}
             </Button>
 
-            {/* MENSAGEM DE STATUS DO PAGAMENTO */}
             {statusPix === "aguardando" && (
               <p className="text-yellow-600 text-sm mt-2 font-medium">⏳ Aguardando pagamento...</p>
             )}

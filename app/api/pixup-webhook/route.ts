@@ -1,101 +1,42 @@
-import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
+// app/api/pixup-webhook/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "@/lib/supabaseClient";
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    console.log('🚨 Webhook PixUp recebido');
+    const body = await req.json();
+    const status = body?.status;
+    const email = body?.creditParty?.email;
+    const transactionId = body?.transactionId;
+    const externalId = body?.external_id;
+    const valor = body?.amount;
+    const dateApproval = body?.dateApproval;
 
-    const supabase = getSupabaseAdmin();
+    if (!email || !status || !transactionId) {
+      return NextResponse.json({ error: "Dados incompletos" }, { status: 400 });
+    }
 
-    const json = await request.json();
-    const requestBody = json?.requestBody;
-
-    const status = requestBody?.status;
-    const email = requestBody?.email || 
-                  requestBody?.metadata?.email || 
-                  requestBody?.external_id || 
-                  requestBody?.creditParty?.email;
-    const normalizedEmail = email?.trim().toLowerCase(); // Normaliza o email
-    const transactionId = requestBody?.transactionId;
-    const amount = requestBody?.amount || 0; // Valor do pagamento
-
-    console.log('📩 Dados recebidos:', { status, email, normalizedEmail, transactionId, amount });
-    console.log('🔍 requestBody completo:', JSON.stringify(requestBody, null, 2));
-
-    // Inserir log na tabela pix_status
-    const { error: insertError, data } = await supabase
-      .from('pix_status')
-      .insert({
-        transaction_id: transactionId || 'sem-id',
-        status: status || 'UNKNOWN',
-        email: normalizedEmail || email || null, // Adicionado campo email
-        created_at: new Date().toISOString()
-      });
+    // Salvar o pagamento na tabela "pagamentos"
+    const { error: insertError } = await supabase.from("pagamentos").insert([
+      {
+        email,
+        status,
+        transaction_id: transactionId,
+        external_id: externalId,
+        valor,
+        aprovado_em: dateApproval,
+      },
+    ]);
 
     if (insertError) {
-      console.error('❌ Erro ao salvar na tabela pix_status:', insertError);
+      console.error("Erro ao inserir pagamento:", insertError);
+      return NextResponse.json({ error: "Erro ao salvar pagamento" }, { status: 500 });
     }
 
-    // Atualizar pagamento_pix se status for PAID e houver email
-    if (status === 'PAID' && normalizedEmail) {
-      // Determinar o tipo de pagamento baseado no valor
-      const isUpgradePayment = amount >= 39.99; // Pagamento de upgrade para Avaliador Internacional
-      
-      if (isUpgradePayment) {
-        // Atualizar upgrade_internacional
-        const { error: upgradeError } = await supabase
-          .from('profiles')
-          .update({ upgrade_internacional: true })
-          .eq('email', normalizedEmail);
-
-        if (upgradeError) {
-          console.error('❌ Erro ao atualizar upgrade_internacional:', upgradeError);
-        } else {
-          console.log('✅ upgrade_internacional atualizado para:', normalizedEmail);
-        }
-      } else {
-        // Atualizar pagamento_pix (pagamento básico)
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ pagamento_pix: true })
-          .eq('email', normalizedEmail);
-
-        if (updateError) {
-          console.error('❌ Erro ao atualizar profiles:', updateError);
-        } else {
-          console.log('✅ pagamento_pix atualizado para:', normalizedEmail);
-        }
-      }
-
-      // Salvar na tabela pagamentos
-      const { error: pagamentoError } = await supabase
-        .from('pagamentos')
-        .insert({
-          email: normalizedEmail,
-          transaction_id: transactionId,
-          status: status,
-          amount: amount,
-          tipo: isUpgradePayment ? 'upgrade' : 'basico',
-          created_at: new Date().toISOString()
-        });
-
-      if (pagamentoError) {
-        console.error('❌ Erro ao salvar na tabela pagamentos:', pagamentoError);
-      } else {
-        console.log('✅ Pagamento salvo na tabela pagamentos para:', normalizedEmail);
-      }
-    } else if (status === 'PAID' && !normalizedEmail) {
-      console.warn('⚠️ Status PAID recebido, mas email não encontrado em metadata, external_id ou email');
-    }
-
-    return NextResponse.json({ message: "OK (Webhook processado)" }, { status: 200 });
-
-  } catch (error) {
-    console.error('💥 Erro geral no webhook:', error);
-    return NextResponse.json(
-      { error: 'Erro interno do servidor', detalhe: (error as Error).message },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("Erro geral no webhook:", err);
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }
 
