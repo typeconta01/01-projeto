@@ -5,17 +5,20 @@ import { supabase } from "@/lib/supabaseClient";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log("📦 Webhook recebido:", JSON.stringify(body, null, 2));
-    const email = body?.email ||
-                  body?.creditParty?.email ||
-                  body?.metadata?.email ||
-                  body?.external_id;
+    const requestBody = body?.requestBody ?? body; // Compatível com formatação PixUp
+
+    // Captura email de múltiplas fontes possíveis
+    const email = requestBody?.email ||
+                  requestBody?.creditParty?.email ||
+                  requestBody?.metadata?.email ||
+                  requestBody?.external_id || null;
     const normalizedEmail = email?.trim()?.toLowerCase();
-    const status = body?.status;
-    const transactionId = body?.transactionId;
-    const externalId = body?.external_id;
-    const valor = body?.amount;
-    const dateApproval = body?.dateApproval;
+
+    const status = requestBody?.status;
+    const transactionId = requestBody?.transactionId;
+    const externalId = requestBody?.external_id;
+    const valor = requestBody?.amount;
+    const dateApproval = requestBody?.dateApproval;
 
     if (!normalizedEmail || !status || !transactionId) {
       return NextResponse.json({ error: "Dados incompletos" }, { status: 400 });
