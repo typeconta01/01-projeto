@@ -60,10 +60,9 @@ export function EvaluatorModeDialog({ children }: { children: React.ReactNode })
           <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mb-4">
             <DollarSign className="w-6 h-6 text-white" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Upgrade para Internacional</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Upgrade para Avaliador Internacional</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Libere sua conta para avaliar livros em inglês e receber pagamentos em dólares. Acesse uma nova biblioteca
-            de livros internacionais!
+            Desbloqueie a avaliação de livros em inglês e receba pagamentos em dólares. Acesse nossa biblioteca exclusiva de livros internacionais!
           </p>
 
           {/* Upgrade Fee Card */}
@@ -76,7 +75,7 @@ export function EvaluatorModeDialog({ children }: { children: React.ReactNode })
           </Card>
           <PixPayment />
           <p className="text-xs text-gray-500 mt-3">
-            * Após o pagamento via PIX, sua conta será automaticamente atualizada.
+            * Após o pagamento via PIX, sua conta será automaticamente atualizada para Avaliador Internacional.
           </p>
         </div>
       </DialogContent>
